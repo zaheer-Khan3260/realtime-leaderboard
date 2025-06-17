@@ -4,7 +4,7 @@
   "main": "local.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node testSocket.js",
     "start": "node local.js",
     "dev": "nodemon -r dotenv/config --experimental-json-modules local.js"
   },
