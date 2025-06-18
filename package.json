@@ -6,18 +6,21 @@
   "scripts": {
     "test": "node testSocket.js",
     "start": "node local.js",
-    "dev": "nodemon -r dotenv/config --experimental-json-modules local.js"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules local.js",
+    "seed": "node src/utils/seedPlayer.js",
+    "build": "echo 'No build step required for Node.js'"
   },
-  "keywords": [],
+  "keywords": ["leaderboard", "real-time", "socket.io", "mongodb", "express"],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Real-time leaderboard system with Socket.IO and MongoDB",
   "dependencies": {
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "mongodb": "^6.17.0",
+    "mongoose": "^8.16.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1"
   },

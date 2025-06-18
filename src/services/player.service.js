@@ -1,42 +1,83 @@
-import Db from './datalayer.services.js';
 import { getTimestamp } from '../helpers/index.js';
-
+import Player from '../model/players.model.js';
 
 class PlayerService {
-  constructor() {
-    this.players = new Db('players');
-  }
-
   async updateScore(playerId, name, region, gameMode, scoreDelta) {
-    
-    const result = await this.players.updateOne(
-      { playerId, region, gameMode },
-      {
-        $set: { 
-          name,
-          lastUpdated: getTimestamp(),
-          region,
-          gameMode 
+    try {
+      const result = await Player.findOneAndUpdate(
+        { playerId, region, gameMode },
+        {
+          $set: { 
+            name,
+            lastUpdated: new Date(),
+            region: region.toUpperCase(),
+            gameMode: gameMode.toLowerCase()
+          },
+          $inc: { dailyScore: scoreDelta },
+          $setOnInsert: { createdAt: new Date() }
         },
-        $inc: { dailyScore: scoreDelta },
-        $setOnInsert: { createdAt: getTimestamp() }
-      },
-      { upsert: true }
-    );
-    
-    return result;
+        { 
+          upsert: true, 
+          new: true,
+          runValidators: true
+        }
+      );
+      
+      return result;
+    } catch (error) {
+      console.error('Error updating score:', error);
+      throw error;
+    }
   }
 
   async getTopPlayers(region, gameMode, limit = 10) {
-    const results = await this.players.find(
-      { region, gameMode },
-      {
-        projection: { _id: 0, playerId: 1, name: 1, dailyScore: 1 },
-        sort: { dailyScore: -1 },
-        limit
-      }
-    );
-    return results.data;
+    try {
+      const players = await Player.find(
+        { 
+          region: region.toUpperCase(), 
+          gameMode: gameMode.toLowerCase() 
+        }
+      )
+      .select('playerId name dailyScore lastUpdated')
+      .sort({ dailyScore: -1 })
+      .limit(limit)
+      .lean();
+      
+      return players;
+    } catch (error) {
+      console.error('Error getting top players:', error);
+      throw error;
+    }
+  }
+
+  async getPlayerById(playerId, region, gameMode) {
+    try {
+      const player = await Player.findOne({
+        playerId,
+        region: region.toUpperCase(),
+        gameMode: gameMode.toLowerCase()
+      }).lean();
+      
+      return player;
+    } catch (error) {
+      console.error('Error getting player by ID:', error);
+      throw error;
+    }
+  }
+
+  async getGlobalLeaderboard(limit = 50) {
+    try {
+      const players = await Player.find()
+        .select('playerId name dailyScore region gameMode lastUpdated')
+        .sort({ dailyScore: -1 })
+        .limit(limit)
+        .lean();
+      
+      return players;
+    } catch (error) {
+      console.error('Error getting global leaderboard:', error);
+      throw error;
+    }
   }
 }
 

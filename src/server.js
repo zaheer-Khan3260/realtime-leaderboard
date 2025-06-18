@@ -3,6 +3,7 @@ import express from "express"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 import { app, server } from "./socket/socket.js";
+import playerRouter from "../src/routes/player.routes.js"
 
 dotenv.config({
     path: './env'
@@ -30,7 +31,7 @@ app.get('/health', (req, res) => {
     res.send('Hello from Real Time Leaderboard System');
 });
 
-// server.use('/', indexRouter);
+app.use('/', playerRouter);
 
 export default server;
 
